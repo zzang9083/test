@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.naver.mapper.translateMapper">
+	<resultMap type="com.naver.dto.translate" id="translate">
+		<result property="id" column="id" />
+		<result property="ko" column="ko" />
+		<result property="en" column="en" />
+		<result property="flag" column="flag" />
+		</resultMap>
+	
+	<insert id="AddTranslate" parameterType="com.naver.dto.translate">
+     INSERT INTO 
+     	translate_tb(ID,KO,EN)
+     VALUES(#{id},#{ko},#{en})
+  </insert>
+  
+  	<select id="ConfirmTranslate" resultType="int">
+	SELECT 
+     	count(ID) 
+	FROM translate_tb
+	WHERE
+   		ID=#{id} AND KO=#{lang} OR EN = #{lang} 
+   </select> 	 
+ 
+ 	<select id="sendProblem" resultType="java.util.HashMap">
+		SELECT KO,EN FROM translate_tb
+		WHERE ID=#{id}
+		ORDER BY RAND()	
+		LIMIT 1
+ 	</select>
+   
+	<select id="confirmId" resultType="int">
+	INSERT INTO USER_TB(ID,FLAG) 
+	SELECT * FROM (SELECT #{id}, '0')AS tmp 
+	WHERE NOT EXISTS (SELECT ID FROM USER_TB WHERE ID = #{id}) 
+	LIMIT 1
+	</select>
+	
+	<update id="updateFlag">
+   	UPDATE 
+   		USER_TB
+   	SET
+   		FLAG=#{flag}
+   	WHERE
+   		ID=#{id} 
+   </update>
+   
+   <update id="updateLang">
+   	UPDATE 
+   		USER_TB
+   	SET
+   		LANG=#{lang}
+   	WHERE
+   		ID=#{id} 
+   </update>
+   
+   <select id="selectIdInfo" resultType="java.util.HashMap">
+		SELECT * FROM USER_TB
+		WHERE ID=#{id}
+		</select>
+   
+   <update id="updateIdInfo">
+   	UPDATE 
+   		USER_TB
+   	SET
+   		EN=#{en} , KO=#{ko} , FLAG="2" 
+   	WHERE
+   		ID=#{id} 
+   </update>
+   
+	
+</mapper>
